@@ -7,12 +7,13 @@
     "lib": "lib"
   },
   "scripts": {
-    "build": "node tools/build.mjs",
+    "build": "node tools/build.mjs --all",
     "build:all": "node tools/build.mjs --all",
     "deploy": "node tools/build.mjs --all && vercel --prod",
     "voice": "node tools/make-voice.mjs",
     "voicetest": "node tools/build.mjs cybercon-2026 --voices",
-    "voices": "node tools/make-voice.mjs --compare"
+    "voices": "node tools/make-voice.mjs --compare",
+    "build:one": "node tools/build.mjs"
   },
   "keywords": [],
   "author": "",
