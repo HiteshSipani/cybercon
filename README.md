@@ -379,6 +379,36 @@ formant synthesiser, put through a speech-chip treatment: band-limited to
 cabinets of that era actually sounded. The music ducks underneath while it
 speaks.
 
+### Editing a conference you already published
+
+In the Studio's live list, press **edit** next to it. The whole conference
+loads back into the form: name, venue, partner, giveaway, sound, captions,
+logo sizes, everything. Change what you need and publish again.
+
+Publishing with the same URL name replaces that conference. A different URL
+name creates a second one, so take care not to change it by accident when you
+only meant to rename the conference.
+
+**The logos are kept unless you replace them.** They are not re-uploaded when
+you edit; the published versions show in the form and stay put. Click a logo
+box only if you actually want to change it.
+
+### Logo size and placement
+
+The **Logo size and placement** card controls both places a logo appears, with
+a live preview of each.
+
+**The LinkedIn scorecard** preview is the real 1200 by 630 layout scaled down,
+using the same paddings, font sizes and positions the renderer uses, so what
+you see is what gets posted. Two sliders set the box for the conference logo
+and two for the partner logo. Artwork is fitted inside its box without
+distortion, so the box is a maximum rather than a stretch.
+
+**The game title screen** preview shows the header as the game draws it. A
+slider sets each logo's height and a dropdown puts it on the left or the right.
+
+Both previews update as you drag, before anything is published.
+
 ### The sound panel (Ctrl+Shift+S)
 
 Everything about the sound is adjustable inside the game, at the stand, with no

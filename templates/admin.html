@@ -89,6 +89,36 @@
        border-top:1px solid var(--line);padding:14px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
   .status{font-size:13px;color:var(--dim);flex:1;min-width:200px}
   .status.ok{color:var(--good)} .status.no{color:var(--bad)}
+
+  .prevwrap{margin-bottom:14px}
+  .prevlabel{font-size:11px;letter-spacing:1.2px;color:#5D6E8B;margin-bottom:7px}
+  /* The card preview is the real 1200x630 layout scaled down, so what is seen
+     here is what the scorecard renders. */
+  .cardprev{width:100%;aspect-ratio:1200/630;position:relative;overflow:hidden;
+    border:1px solid var(--line);border-radius:10px;
+    background:linear-gradient(135deg,#0b1730,#070d18);
+    container-type:inline-size;font-family:sans-serif;line-height:1.16}
+  .cardprev>*{position:relative}
+  .cp-hd{display:flex;align-items:center;justify-content:space-between;
+    padding:3.66cqw 5.33cqw 0}
+  .cp-rt{display:flex;align-items:center}
+  .cp-s48{width:15cqw;height:3.66cqw;object-fit:contain}
+  .cp-x{color:#43526f;font-size:2.5cqw;font-weight:600;margin:0 1.33cqw}
+  .cp-chall{color:#F5B301;font-size:1.92cqw;letter-spacing:.33cqw;margin:3cqw 0 0 5.33cqw}
+  .cp-head{font-size:4.66cqw;font-weight:700;margin:1cqw 0 0 5.33cqw;color:#EAEFF8}
+  .cp-name{font-size:7cqw;font-weight:700;color:#F5B301;margin:0 0 0 5.33cqw}
+  .cp-co{font-size:2.33cqw;color:#8fa0bd;margin-left:5.33cqw}
+  .cp-row{font-size:2.66cqw;color:#c3d0e6;margin:.66cqw 0 0 5.33cqw}
+  .cp-row.blue{color:#3D82F7}
+  .cp-evtxt,.cp-pttxt{font-size:2.16cqw;font-weight:700;display:none}
+  .cp-evtxt{color:#8FA0BD} .cp-pttxt{color:#EAEFF8}
+  .cp-bot{position:absolute;right:5cqw;bottom:3.17cqw;width:23.3cqw;height:auto}
+  .gameprev{display:flex;align-items:center;justify-content:space-between;gap:14px;
+    min-height:86px;padding:12px 16px;border:1px solid var(--line);border-radius:10px;
+    background:#070C16}
+  .gp-side{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .gp-right{justify-content:flex-end}
+  .gp-side img{width:auto;max-width:150px;object-fit:contain}
   a{color:var(--blue)}
   .lock{display:flex;gap:10px;align-items:center}
   .lock input{width:190px}
@@ -195,6 +225,80 @@
             </div>
             <div class="warnbox" id="warn-partnerLogo"></div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Logo size and placement</h2>
+
+      <div class="prevwrap">
+        <div class="prevlabel">LinkedIn scorecard &middot; 1200 &times; 630</div>
+        <div class="cardprev" id="cardPrev">
+          <div class="cp-hd">
+            <img id="cpEvent" alt="">
+            <div class="cp-evtxt" id="cpEventTxt"></div>
+            <div class="cp-rt">
+              <img src="/admin/strike48.png" class="cp-s48" alt="Strike48">
+              <span class="cp-x" id="cpX">&times;</span>
+              <img id="cpPartner" alt="">
+              <div class="cp-pttxt" id="cpPartnerTxt"></div>
+            </div>
+          </div>
+          <div class="cp-chall">BEAT THE BOT &nbsp;&middot;&nbsp; AGENTIC SOC CHALLENGE</div>
+          <div class="cp-head">I raced the Agentic SOC</div>
+          <div class="cp-name">Hitesh</div>
+          <div class="cp-co">Strike48</div>
+          <div class="cp-row">Rank: SOC Tier-2</div>
+          <div class="cp-row">My time: 9.4s &middot; 3/3 correct</div>
+          <div class="cp-row blue" id="cpBot">The AI triaged in 3.5s</div>
+          <img src="/admin/bot.png" class="cp-bot" alt="">
+        </div>
+      </div>
+      <div class="row two">
+        <div>
+          <label>Conference logo on the card <span id="ceEcho">233 &times; 80</span></label>
+          <input type="range" id="cardEventW" min="90" max="420" value="233">
+          <input type="range" id="cardEventH" min="30" max="140" value="80" style="margin-top:6px">
+        </div>
+        <div>
+          <label>Partner logo on the card <span id="cpEcho">288 &times; 42</span></label>
+          <input type="range" id="cardPartnerW" min="90" max="420" value="288">
+          <input type="range" id="cardPartnerH" min="24" max="120" value="42" style="margin-top:6px">
+        </div>
+      </div>
+      <div class="hint" style="margin-top:-4px;margin-bottom:16px">
+        Artwork is fitted inside the box without distortion, so the box is a maximum rather than a stretch.
+      </div>
+
+      <div class="prevwrap">
+        <div class="prevlabel">Game title screen, top of the page</div>
+        <div class="gameprev" id="gamePrev">
+          <div class="gp-side" id="gpLeft"></div>
+          <div class="gp-side gp-right" id="gpRight"></div>
+        </div>
+      </div>
+      <div class="row three">
+        <div>
+          <label>Conference <span id="geEcho">63px</span></label>
+          <input type="range" id="gameEvent" min="18" max="130" value="63">
+          <select id="posEvent" style="margin-top:7px">
+            <option value="left">Left</option><option value="right">Right</option>
+          </select>
+        </div>
+        <div>
+          <label>Strike48 <span id="gsEcho">38px</span></label>
+          <input type="range" id="gameStrike" min="18" max="130" value="38">
+          <select id="posStrike" style="margin-top:7px">
+            <option value="left">Left</option><option value="right" selected>Right</option>
+          </select>
+        </div>
+        <div>
+          <label>Partner <span id="gaEcho">38px</span></label>
+          <input type="range" id="gamePartner" min="18" max="130" value="38">
+          <select id="posPartner" style="margin-top:7px">
+            <option value="left">Left</option><option value="right" selected>Right</option>
+          </select>
         </div>
       </div>
     </div>
@@ -352,6 +456,10 @@
 
 const $ = id => document.getElementById(id);
 const files = { logo: null, partnerLogo: null };
+// Logos of an event loaded for editing, shown in the preview until replaced.
+let loadedLogos = { event: '', partner: '' };
+let editingSlug = null;
+let loadedLogoNames = { logo: '', partnerLogo: '' };
 
 /* ---------- slug ---------- */
 function slugify(s){
@@ -433,6 +541,14 @@ function read(){
     botTime: parseFloat($('botTime').value) || 3.5,
     hashtags: $('extraTags').value.split(/[,\s]+/).filter(Boolean),
   };
+  ev.logos = {
+    cardEventW: +$('cardEventW').value, cardEventH: +$('cardEventH').value,
+    cardPartnerW: +$('cardPartnerW').value, cardPartnerH: +$('cardPartnerH').value,
+    gameEvent: +$('gameEvent').value, gameStrike: +$('gameStrike').value,
+    gamePartner: +$('gamePartner').value,
+    posEvent: $('posEvent').value, posStrike: $('posStrike').value,
+    posPartner: $('posPartner').value,
+  };
   if ($('ownCaps').checked) {
     const own = $('capEdit').value.split('\n').map(t => t.trim()).filter(Boolean);
     if (own.length) ev.captions = own;
@@ -512,6 +628,8 @@ function render(){
     $('tags').textContent = '—';
   }
 
+  try { drawPreviews(ev); } catch (e) {}
+
   const ready = !Object.keys(bad).length;
   $('publishBtn').disabled = !ready;
   if (!ev.eventName) setStatus('Fill in the conference name to begin.');
@@ -523,6 +641,51 @@ function render(){
 }
 function setStatus(msg, kind){ const s = $('status'); s.textContent = msg; s.className = 'status' + (kind ? ' ' + kind : ''); }
 document.querySelectorAll('input,select,textarea').forEach(el => el.addEventListener('input', render));
+
+
+/* ---------- previews ---------- */
+// Both mirror the real renderers: the card uses the same 1200x630 proportions
+// as api/og.js, and the game header uses the same max-height rule the game does.
+function drawPreviews(ev) {
+  const L = ev.logos;
+  $('ceEcho').textContent = L.cardEventW + ' \u00d7 ' + L.cardEventH;
+  $('cpEcho').textContent = L.cardPartnerW + ' \u00d7 ' + L.cardPartnerH;
+  $('geEcho').textContent = L.gameEvent + 'px';
+  $('gsEcho').textContent = L.gameStrike + 'px';
+  $('gaEcho').textContent = L.gamePartner + 'px';
+
+  const evSrc = files.logo ? files.logo.dataUrl : (loadedLogos.event || '');
+  const ptSrc = files.partnerLogo ? files.partnerLogo.dataUrl : (loadedLogos.partner || '');
+  const partner = ev.partner ? ev.partner.name : '';
+
+  // card: sizes are in card pixels, expressed against the 1200px width
+  const pc = n => (n / 1200 * 100) + 'cqw';
+  const ce = $('cpEvent'), cp = $('cpPartner');
+  if (evSrc) { ce.src = evSrc; ce.style.display = ''; $('cpEventTxt').style.display = 'none'; }
+  else { ce.style.display = 'none'; $('cpEventTxt').textContent = ev.eventName || 'Conference';
+         $('cpEventTxt').style.display = 'block'; }
+  ce.style.width = pc(L.cardEventW); ce.style.height = pc(L.cardEventH);
+  ce.style.objectFit = 'contain';
+
+  if (ptSrc && partner) { cp.src = ptSrc; cp.style.display = ''; $('cpPartnerTxt').style.display = 'none'; }
+  else { cp.style.display = 'none';
+         $('cpPartnerTxt').textContent = partner;
+         $('cpPartnerTxt').style.display = partner ? 'block' : 'none'; }
+  cp.style.width = pc(L.cardPartnerW); cp.style.height = pc(L.cardPartnerH);
+  cp.style.objectFit = 'contain';
+  $('cpX').style.display = partner ? '' : 'none';
+  $('cpBot').textContent = 'The AI triaged in ' + (ev.botTime || 3.5) + 's';
+
+  // game header: max-height in px, grouped left or right, exactly as the game does
+  const items = [];
+  if (evSrc) items.push({ src: evSrc, h: L.gameEvent, pos: L.posEvent });
+  items.push({ src: '/admin/strike48.png', h: L.gameStrike, pos: L.posStrike });
+  if (ptSrc && partner) items.push({ src: ptSrc, h: L.gamePartner, pos: L.posPartner });
+  const html = side => items.filter(i => i.pos === side)
+    .map(i => '<img src="' + i.src + '" style="max-height:' + i.h + 'px">').join('');
+  $('gpLeft').innerHTML = html('left');
+  $('gpRight').innerHTML = html('right');
+}
 
 /* ---------- existing events ---------- */
 async function loadEvents(){
@@ -543,6 +706,8 @@ async function loadEvents(){
           <div class="meta">/e/${e.slug}${e.partner ? ' · with ' + e.partner : ' · solo'}${e.venue ? ' · ' + e.venue : ''}</div>
         </div>
         <span class="pill ${e.giveaway ? 'on' : ''}">${e.giveaway ? 'giveaway' : 'no giveaway'}</span>
+        <button class="pill" style="cursor:pointer;background:none"
+          onclick="loadEvent('${e.slug}')">edit</button>
         <a class="pill" href="/e/${e.slug}" target="_blank">open</a>
         <a class="pill" href="/e/${e.slug}/offline.html" download="beat-the-bot-${e.slug}.html"
            title="Self-contained file for the booth laptop">download</a>
@@ -550,6 +715,79 @@ async function loadEvents(){
       : '<div class="hint">Nothing published yet.</div>';
   }catch(e){ $('events').innerHTML = '<div class="hint">Could not load the list.</div>'; }
 }
+
+
+// Load a published conference back into the form. Publishing again with the
+// same URL name replaces it, so this is how an event gets edited rather than
+// retyped.
+window.loadEvent = async function (slug) {
+  setStatus('Loading ' + slug + '\u2026');
+  let d;
+  try {
+    const r = await fetch('/api/events?slug=' + encodeURIComponent(slug));
+    if (!r.ok) throw new Error('not found');
+    d = await r.json();
+  } catch (e) { setStatus('Could not load that conference.', 'no'); return; }
+
+  const set = (id, v) => { const el = $(id); if (el != null && v != null) el.value = v; };
+  set('eventName', d.eventName); set('slug', slug); slugTouched = true;
+  set('venue', d.venue); set('booth', d.booth); set('language', d.language || 'en');
+  set('botTime', d.botTime ?? 3.5);
+  set('extraTags', (d.hashtags || []).join(' '));
+
+  $('hasPartner').checked = !!(d.partner && d.partner.name);
+  $('partnerFields').hidden = !$('hasPartner').checked;
+  set('partnerName', (d.partner && d.partner.name) || '');
+  set('partnerLinkedIn', (d.partner && d.partner.linkedIn) || '');
+
+  const gv = d.giveaway || {};
+  $('hasGiveaway').checked = !!gv.enabled;
+  $('giveawayFields').hidden = !gv.enabled;
+  set('prize', gv.prize || ''); set('drawTime', gv.drawTime || '');
+  set('claimSeconds', gv.claimSeconds ?? 10);
+
+  const a = d.audio || {};
+  $('hasMusic').checked = a.music !== false;
+  $('hasVoice').checked = a.voice !== false;
+  $('showText').checked = a.showText !== false;
+  $('allVoices').checked = !!a.allVoices;
+  set('musicTrack', a.track || '');
+  set('voiceStyle', a.style || 'announcer');
+  set('volume', Math.round((a.volume ?? 0.5) * 100));
+  set('attractSeconds', a.attractSeconds ?? 14);
+  $('lines').value = (a.lines || []).join('\n');
+
+  $('ownCaps').checked = !!(d.captions && d.captions.length);
+  $('capEdit').value = (d.captions || []).join('\n');
+
+  const L = d.logos || {}, C = d.card || {};
+  set('cardEventW', L.cardEventW ?? C.eventW ?? 233);
+  set('cardEventH', L.cardEventH ?? C.eventH ?? 80);
+  set('cardPartnerW', L.cardPartnerW ?? C.partnerW ?? 288);
+  set('cardPartnerH', L.cardPartnerH ?? C.partnerH ?? 42);
+  set('gameEvent', L.gameEvent ?? 63); set('gameStrike', L.gameStrike ?? 38);
+  set('gamePartner', L.gamePartner ?? 38);
+  set('posEvent', L.posEvent || 'left'); set('posStrike', L.posStrike || 'right');
+  set('posPartner', L.posPartner || 'right');
+
+  // The images themselves are not sent back, only their filenames. The
+  // published versions are shown in the preview and kept unless replaced.
+  files.logo = files.partnerLogo = null;
+  loadedLogos = { event: '/e/' + slug + '/event-logo.png',
+                  partner: '/e/' + slug + '/partner-logo.png' };
+  editingSlug = slug;
+  loadedLogoNames = { logo: d.logo || '', partnerLogo: (d.partner && d.partner.logo) || '' };
+  for (const [k, src] of [['logo', loadedLogos.event], ['partnerLogo', loadedLogos.partner]]) {
+    const el = $('drop-' + k), inp = el.querySelector('input');
+    el.innerHTML = '<img src="' + src + '" alt=""><div class="fn">published logo, click to replace</div>';
+    el.appendChild(inp);
+    $('warn-' + k).style.display = 'none';
+  }
+
+  render();
+  setStatus('Editing ' + d.eventName + '. Publishing replaces it.', 'ok');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
 
 /* ---------- publish ---------- */
 $('publishBtn').addEventListener('click', async () => {
@@ -562,7 +800,11 @@ $('publishBtn').addEventListener('click', async () => {
     const r = await fetch('/api/publish', {
       method:'POST',
       headers:{ 'Content-Type':'application/json', 'x-admin-password': pw },
-      body: JSON.stringify({ event: ev, logos: files }),
+      body: JSON.stringify({ event: ev, logos: files,
+        keep: editingSlug === ev.slug ? {
+          logo: files.logo ? '' : loadedLogoNames.logo,
+          partnerLogo: files.partnerLogo ? '' : loadedLogoNames.partnerLogo,
+        } : null }),
     });
     const j = await r.json().catch(() => ({}));
     if (!r.ok) { setStatus(j.error || `Publish failed (${r.status}).`, 'no'); $('publishBtn').disabled = false; return; }
@@ -583,6 +825,8 @@ $('resetBtn').addEventListener('click', () => {
   $('capEdit').value = ''; $('ownCaps').checked = false;
   $('musicTrack').value = 'arcade-loop.mp3'; $('allVoices').checked = false;
   files.logo = files.partnerLogo = null; slugTouched = false;
+  loadedLogos = { event: '', partner: '' }; editingSlug = null;
+  loadedLogoNames = { logo: '', partnerLogo: '' };
   $('partnerFields').hidden = $('giveawayFields').hidden = true;
   for (const k of ['logo','partnerLogo']) {
     const el = $('drop-' + k), inp = el.querySelector('input');

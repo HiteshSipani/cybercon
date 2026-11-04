@@ -40,6 +40,10 @@ export default function handler(req) {
   const PARTNER_TXT    = (ev && ev.partner)   || q.get('partner') || '';
   const EVENT_LOGO_URL   = ev && ev.logoEvent   ? origin + ev.logoEvent   : '';
   const PARTNER_LOGO_URL = ev && ev.logoPartner ? origin + ev.logoPartner : '';
+  // Logo boxes come from the event so they can be adjusted in the Studio.
+  const CARD = (ev && ev.card) || {};
+  const EV_W = CARD.eventW || 233, EV_H = CARD.eventH || 80;
+  const PT_W = CARD.partnerW || 288, PT_H = CARD.partnerH || 42;
   const EVENT_LOGO_ON   = !!EVENT_LOGO_URL;
   const PARTNER_LOGO_ON = !!PARTNER_LOGO_URL;
   // A solo event shows the Strike48 mark alone, with no stray multiplication sign.
@@ -67,7 +71,7 @@ export default function handler(req) {
       // Header row is IN THE FLOW, so the logos can never overlap the text below.
       React.createElement('div', { key: 'hdr', style: { display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'space-between' } }, [
         EVENT_LOGO_ON
-          ? React.createElement('img', { key: 'evlogo', src: EVENT_LOGO_URL, width: 233, height: 80, style: { objectFit: 'contain' } })
+          ? React.createElement('img', { key: 'evlogo', src: EVENT_LOGO_URL, width: EV_W, height: EV_H, style: { objectFit: 'contain' } })
           : React.createElement('div', { key: 'evtxt', style: { display: 'flex', color: '#8FA0BD', fontSize: 26, fontWeight: 700 } }, EVENT_NAME_TXT),
         React.createElement('div', { key: 'rt', style: { display: 'flex', alignItems: 'center' } }, [
           React.createElement('img', { key: 's48logo', src: LOGO_STRIKE, width: 180, height: 44 }),
@@ -75,7 +79,7 @@ export default function handler(req) {
             ? React.createElement('div', { key: 'x', style: { display: 'flex', color: '#43526f', fontSize: 30, fontWeight: 600, margin: '0 16px' } }, '\u00d7')
             : null,
           PARTNER_LOGO_ON
-            ? React.createElement('img', { key: 'ptlogo', src: PARTNER_LOGO_URL, width: 288, height: 42, style: { objectFit: 'contain' } })
+            ? React.createElement('img', { key: 'ptlogo', src: PARTNER_LOGO_URL, width: PT_W, height: PT_H, style: { objectFit: 'contain' } })
             : (PARTNER_TXT
                 ? React.createElement('div', { key: 'pttxt', style: { display: 'flex', color: '#EAEFF8', fontSize: 26, fontWeight: 700 } }, PARTNER_TXT)
                 : null)

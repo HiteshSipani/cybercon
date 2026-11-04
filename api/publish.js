@@ -100,6 +100,7 @@ export default async function handler(req, res) {
   const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
   const ev = body.event;
   const logos = body.logos || {};
+  const keep = body.keep || null;
 
   const errs = validate(ev);
   if (errs.length) return bad(res, 400, errs.join('. '));
@@ -115,6 +116,24 @@ export default async function handler(req, res) {
     botTime: ev.botTime ?? 3.5,
   };
   if (Array.isArray(ev.hashtags) && ev.hashtags.length) record.hashtags = ev.hashtags;
+  if (ev.logos && typeof ev.logos === 'object') {
+    const num = (v, lo, hi, d) => {
+      const n = Number(v); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d;
+    };
+    const pos = v => (v === 'left' || v === 'right') ? v : undefined;
+    record.logos = {
+      cardEventW: num(ev.logos.cardEventW, 60, 500, 233),
+      cardEventH: num(ev.logos.cardEventH, 20, 180, 80),
+      cardPartnerW: num(ev.logos.cardPartnerW, 60, 500, 288),
+      cardPartnerH: num(ev.logos.cardPartnerH, 20, 180, 42),
+      gameEvent: num(ev.logos.gameEvent, 12, 160, 63),
+      gameStrike: num(ev.logos.gameStrike, 12, 160, 38),
+      gamePartner: num(ev.logos.gamePartner, 12, 160, 38),
+      posEvent: pos(ev.logos.posEvent) || 'left',
+      posStrike: pos(ev.logos.posStrike) || 'right',
+      posPartner: pos(ev.logos.posPartner) || 'right',
+    };
+  }
   if (Array.isArray(ev.captions)) {
     const caps = ev.captions.map(c => String(c).trim())
                             .filter(c => c && c.length <= 1200).slice(0, 40);
@@ -123,6 +142,15 @@ export default async function handler(req, res) {
 
   for (const [key, field] of [['logo', 'logo'], ['partnerLogo', 'partnerLogo']]) {
     const f = logos[key];
+    // Editing an event without re-uploading a logo keeps the published one.
+    // The Studio sends the stored filename, because guessing the extension
+    // would break any logo that was uploaded as SVG, WebP or HEIC.
+    if ((!f || !f.dataUrl) && keep && typeof keep[key] === 'string' && keep[key]) {
+      if (!/^[a-z0-9][a-z0-9._-]*$/i.test(keep[key])) return bad(res, 400, 'bad logo reference');
+      if (key === 'logo') record.logo = keep[key];
+      else record._partnerLogoFile = keep[key];
+      continue;
+    }
     if (!f || !f.dataUrl) continue;
     const parsed = parseDataUrl(f.dataUrl);
     if (!parsed) return bad(res, 400, `could not read the ${key}`);

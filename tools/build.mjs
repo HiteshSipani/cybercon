@@ -298,8 +298,17 @@ async function buildOne(slug, shared) {
   // --- baked game config -------------------------------------------------
   const partnerName = (ev.partner && ev.partner.name) || '';
   const giveaway = ev.giveaway || { enabled: false };
+  const L = ev.logos || {};
   const cfg = {
     ...shared.cfgDefaults,
+    // Logo layout. The defaults are what used to be hardcoded.
+    logoSize:        L.gameBase    ?? shared.cfgDefaults.logoSize,
+    logoSizeEvent:   L.gameEvent   ?? shared.cfgDefaults.logoSizeEvent,
+    logoSizeStrike:  L.gameStrike  ?? shared.cfgDefaults.logoSizeStrike,
+    logoSizePartner: L.gamePartner ?? shared.cfgDefaults.logoSizePartner,
+    logoPosEvent:    L.posEvent    || shared.cfgDefaults.logoPosEvent,
+    logoPosStrike:   L.posStrike   || shared.cfgDefaults.logoPosStrike,
+    logoPosPartner:  L.posPartner  || shared.cfgDefaults.logoPosPartner,
     eventSlug: slug,
     eventName: ev.eventName,
     eventVenue: ev.venue || '',
@@ -398,6 +407,18 @@ async function buildOne(slug, shared) {
       botTime: cfg.botTime,
       hashtags: buildHashtags(ev.eventName, ev.hashtags),
       giveaway: !!giveaway.enabled,
+      card: {
+        eventW:   L.cardEventW   ?? 233, eventH:   L.cardEventH   ?? 80,
+        partnerW: L.cardPartnerW ?? 288, partnerH: L.cardPartnerH ?? 42,
+      },
+      // The event as it was published, so the Studio can load it back for editing.
+      source: {
+        eventName: ev.eventName, venue: ev.venue || '', booth: ev.booth || '',
+        language: ev.language || 'en', botTime: cfg.botTime,
+        logo: ev.logo || '', hashtags: ev.hashtags || [],
+        partner: ev.partner || null, giveaway: ev.giveaway || { enabled: false },
+        audio: ev.audio || {}, captions: ev.captions || null, logos: L,
+      },
       logoEvent: logos.event ? `/e/${slug}/event-logo.png` : '',
       logoPartner: logos.partner ? `/e/${slug}/partner-logo.png` : '',
       captions,
@@ -433,6 +454,16 @@ async function main() {
   // of truth (lib/captions.js) but a page with no external script, so it works
   // served, at /studio behind the rewrite, and opened straight off disk.
   await mkdir(p('public', 'admin'), { recursive: true });
+  // The Studio's card preview needs the two images the scorecard always draws.
+  // They live as base64 inside api/og.js, so they are written out once here
+  // rather than duplicated in the repo.
+  {
+    const og = await readFile(p('api', 'og.js'), 'utf8');
+    for (const [name, file] of [['LOGO_STRIKE', 'strike48.png'], ['BOT_IMG', 'bot.png']]) {
+      const m = og.match(new RegExp(`const ${name}\\s*=\\s*'data:image/png;base64,([^']+)'`));
+      if (m) await writeFile(p('public', 'admin', file), Buffer.from(m[1], 'base64'));
+    }
+  }
   const adminTpl = await readFile(p('templates', 'admin.html'), 'utf8');
   const capLib = (await readFile(p('lib', 'captions.js'), 'utf8'))
     .replace(/^export\s+/gm, '');          // module scope, no imports needed
