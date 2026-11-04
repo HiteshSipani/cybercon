@@ -1,0 +1,29 @@
+{
+  "eventName": "International CIO Forum 2026",
+  "venue": "Medina Hammamet Hotel, Tunisia",
+  "booth": "",
+  "language": "en",
+  "botTime": 3.5,
+  "hashtags": [
+    "#keystone"
+  ],
+  "logo": "international-cio-forum-2026-event.jpg",
+  "partner": {
+    "name": "Keystone Group",
+    "logo": "international-cio-forum-2026-partner.jpg",
+    "linkedIn": "https://www.linkedin.com/company/keystone-cybersecurity/"
+  },
+  "audio": {
+    "music": true,
+    "voice": true,
+    "volume": 0.5,
+    "attractSeconds": 14,
+    "showText": true,
+    "allVoices": true,
+    "style": "announcer",
+    "track": "arcade-loop.mp3"
+  },
+  "giveaway": {
+    "enabled": false
+  }
+}
