@@ -1,0 +1,25 @@
+{
+  "eventName": "CyberCon 2026",
+  "venue": "Melbourne Convention and Exhibition Centre",
+  "booth": "",
+  "language": "en",
+  "logo": "event-logo.png",
+  "botTime": 3.5,
+  "partner": {
+    "name": "Netpoleon",
+    "logo": "partner-logo.png",
+    "linkedIn": "https://www.linkedin.com/company/netpoleon-anz"
+  },
+  "giveaway": {
+    "enabled": true,
+    "prize": "Nintendo Switch 2",
+    "drawTime": "3:30 PM",
+    "claimSeconds": 10,
+    "source": "lb"
+  },
+  "audio": {
+    "track": "arcade-loop.mp3",
+    "style": "mk",
+    "allVoices": true
+  }
+}

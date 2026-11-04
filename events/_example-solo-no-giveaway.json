@@ -1,0 +1,11 @@
+{
+  "_comment": "Example only. Files starting with _ are skipped by the builder. Copy it, rename without the underscore, and edit.",
+  "eventName": "FIC 2027",
+  "venue": "Lille Grand Palais",
+  "booth": "D18",
+  "language": "fr",
+  "botTime": 3.2,
+  "giveaway": {
+    "enabled": false
+  }
+}

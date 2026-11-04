@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Beat the Bot — Event Studio</title>
+<style>
+  :root{
+    --bg:#070C16; --panel:#0E1726; --panel2:#121D30; --line:#223149;
+    --ink:#EAEFF8; --dim:#8FA0BD; --dimmer:#5D6E8B;
+    --gold:#F5B301; --blue:#3D82F7; --good:#2FBF71; --bad:#FF6B6B;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:15px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+       -webkit-font-smoothing:antialiased}
+  header{border-bottom:1px solid var(--line);padding:18px 24px;display:flex;
+         align-items:center;gap:14px;position:sticky;top:0;background:rgba(7,12,22,.92);
+         backdrop-filter:blur(8px);z-index:20;flex-wrap:wrap}
+  header h1{font-size:17px;margin:0;font-weight:700;letter-spacing:-.2px}
+  header .sub{color:var(--dim);font-size:13px}
+  .spacer{flex:1}
+  .wrap{max-width:1180px;margin:0 auto;padding:24px;display:grid;
+        grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px;align-items:start}
+  @media(max-width:900px){.wrap{grid-template-columns:1fr;padding:16px}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:20px}
+  .card h2{font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:var(--dim);
+           margin:0 0 16px;font-weight:700}
+  label{display:block;font-size:13px;color:var(--dim);margin:0 0 6px}
+  .req{color:var(--gold)}
+  input[type=text],input[type=number],input[type=password],select{
+    width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    border-radius:9px;padding:11px 12px;font:inherit;font-size:14px}
+  input:focus,select:focus{outline:none;border-color:var(--blue)}
+  input::placeholder{color:var(--dimmer)}
+  .row{display:grid;gap:14px;margin-bottom:14px}
+  .row.two{grid-template-columns:1fr 1fr}
+  .row.three{grid-template-columns:1.2fr 1fr 1fr}
+  @media(max-width:560px){.row.two,.row.three{grid-template-columns:1fr}}
+  .hint{font-size:12px;color:var(--dimmer);margin-top:5px}
+  .err{font-size:12px;color:var(--bad);margin-top:5px;display:none}
+  .bad input{border-color:var(--bad)}
+  .bad .err{display:block}
+
+  .switch{display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;
+          padding:12px 14px;background:var(--panel2);border:1px solid var(--line);border-radius:10px}
+  .switch input{position:absolute;opacity:0;pointer-events:none}
+  .track{width:42px;height:24px;border-radius:999px;background:#27364f;position:relative;
+         transition:background .18s;flex:none}
+  .knob{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;
+        background:var(--ink);transition:transform .18s}
+  .switch input:checked ~ .track{background:var(--gold)}
+  .switch input:checked ~ .track .knob{transform:translateX(18px);background:#0a1120}
+  .switch .txt{font-size:14px}
+  .switch .txt small{display:block;color:var(--dimmer);font-size:12px}
+
+  .drop{border:1.5px dashed var(--line);border-radius:11px;padding:16px;text-align:center;
+        cursor:pointer;background:var(--panel2);transition:border-color .15s,background .15s}
+  .drop:hover,.drop.over{border-color:var(--gold);background:#16233a}
+  .drop input{display:none}
+  .drop .ph{color:var(--dimmer);font-size:13px}
+  .drop img{max-height:54px;max-width:100%;object-fit:contain}
+  .drop .fn{font-size:12px;color:var(--dim);margin-top:7px;word-break:break-all}
+  .warnbox{margin-top:8px;font-size:12px;color:#FFC46B;background:#2a2113;
+           border:1px solid #4a3a1a;border-radius:8px;padding:8px 10px;display:none}
+
+  button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);
+         background:var(--panel2);color:var(--ink);padding:11px 16px;font-size:14px}
+  button:hover{border-color:#31435f}
+  button.primary{background:var(--gold);color:#0a1120;border:none;font-weight:700;padding:13px 22px;font-size:15px}
+  button.primary:disabled{opacity:.45;cursor:not-allowed}
+  button.ghost{background:transparent}
+  button.danger{color:var(--bad)}
+
+  .caps{max-height:330px;overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}
+  .cap{padding:12px 14px;border-bottom:1px solid var(--line);font-size:13px;line-height:1.55;color:#cfdaea}
+  .cap:last-child{border-bottom:none}
+  .cap b{color:var(--gold);font-weight:700}
+  .tok{color:var(--blue)}
+
+  .ev{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .ev:last-child{border-bottom:none}
+  .ev .nm{font-weight:600;font-size:14px}
+  .ev .meta{color:var(--dimmer);font-size:12px}
+  .pill{font-size:11px;padding:3px 8px;border-radius:999px;border:1px solid var(--line);color:var(--dim)}
+  .pill.on{color:var(--good);border-color:#1d4b34}
+
+  .bar{position:sticky;bottom:0;background:rgba(7,12,22,.94);backdrop-filter:blur(8px);
+       border-top:1px solid var(--line);padding:14px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .status{font-size:13px;color:var(--dim);flex:1;min-width:200px}
+  .status.ok{color:var(--good)} .status.no{color:var(--bad)}
+  a{color:var(--blue)}
+  .lock{display:flex;gap:10px;align-items:center}
+  .lock input{width:190px}
+  code{background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:12px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Beat the Bot</h1>
+  <span class="sub">Event Studio</span>
+  <div class="spacer"></div>
+  <div class="lock">
+    <input type="password" id="pw" placeholder="Publish password" autocomplete="current-password">
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ left: the form ============ -->
+  <div>
+    <div class="card">
+      <h2>The conference</h2>
+      <div class="row">
+        <div id="f-eventName">
+          <label>Conference name <span class="req">*</span></label>
+          <input type="text" id="eventName" placeholder="RSA Conference 2027">
+          <div class="hint">Shown on the title screen and in every caption. The hashtag is built from it.</div>
+          <div class="err">A conference name is required.</div>
+        </div>
+      </div>
+      <div class="row three">
+        <div id="f-slug">
+          <label>URL name</label>
+          <input type="text" id="slug" placeholder="rsa-conference-2027">
+          <div class="hint">Game lives at /e/<span id="slugEcho">…</span></div>
+          <div class="err">Lowercase words joined by hyphens.</div>
+        </div>
+        <div>
+          <label>Language</label>
+          <select id="language">
+            <option value="en">English</option>
+            <option value="fr">French</option>
+            <option value="es">Spanish</option>
+          </select>
+          <div class="hint" id="langHint">&nbsp;</div>
+        </div>
+        <div>
+          <label>AI time (seconds)</label>
+          <input type="number" id="botTime" value="3.5" step="0.1" min="0.5" max="59">
+          <div class="hint">The number visitors race.</div>
+        </div>
+      </div>
+      <div class="row two">
+        <div>
+          <label>Venue</label>
+          <input type="text" id="venue" placeholder="Moscone Center, San Francisco">
+        </div>
+        <div>
+          <label>Booth</label>
+          <input type="text" id="booth" placeholder="N-4412">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Conference logo</label>
+          <div class="drop" id="drop-logo">
+            <input type="file" accept="image/*,.svg">
+            <div class="ph">Click or drop a logo. SVG, PNG, WebP, HEIC or JPEG.</div>
+          </div>
+          <div class="warnbox" id="warn-logo"></div>
+          <div class="hint">The card is near-black, so light or white artwork works best. Without a logo the card prints the name as text.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Partner</h2>
+      <label class="switch" style="margin-bottom:14px">
+        <input type="checkbox" id="hasPartner">
+        <span class="track"><span class="knob"></span></span>
+        <span class="txt">Running this with a partner
+          <small>Off means solo. Captions and the scorecard adjust automatically.</small></span>
+      </label>
+      <div id="partnerFields" hidden>
+        <div class="row two">
+          <div id="f-partnerName">
+            <label>Partner name <span class="req">*</span></label>
+            <input type="text" id="partnerName" placeholder="Optiv">
+            <div class="err">A partner name is required when the partner switch is on.</div>
+          </div>
+          <div>
+            <label>Partner LinkedIn</label>
+            <input type="text" id="partnerLinkedIn" placeholder="https://www.linkedin.com/company/optiv">
+            <div class="hint">Adds a Follow button to the share page.</div>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Partner logo</label>
+            <div class="drop" id="drop-partnerLogo">
+              <input type="file" accept="image/*,.svg">
+              <div class="ph">Click or drop a logo.</div>
+            </div>
+            <div class="warnbox" id="warn-partnerLogo"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Sound</h2>
+      <label class="switch" style="margin-bottom:12px">
+        <input type="checkbox" id="hasMusic" checked>
+        <span class="track"><span class="knob"></span></span>
+        <span class="txt">Arcade music
+          <small>Plays continuously, and opens up during a round.</small></span>
+      </label>
+      <div class="row" id="trackRow">
+        <div>
+          <label>Music</label>
+          <select id="musicTrack">
+            <option value="arcade-loop.mp3">Retro arcade loop (supplied)</option>
+            <option value="">Synthesised bed (no file)</option>
+          </select>
+          <div class="hint">The loop is seam-matched, so it repeats without a gap.</div>
+        </div>
+      </div>
+      <label class="switch" style="margin-bottom:14px">
+        <input type="checkbox" id="hasVoice" checked>
+        <span class="track"><span class="knob"></span></span>
+        <span class="txt">Attract announcer
+          <small>Calls out the challenge on the title screen until someone plays.</small></span>
+      </label>
+      <div class="row two" id="styleRow">
+        <div>
+          <label>Announcer voice</label>
+          <select id="voiceStyle">
+            <option value="mk">Fighter — deepest, driven, big room</option>
+            <option value="mkLite">Fighter (lighter) — less grit</option>
+            <option value="announcer">Announcer — deep, big cabinet</option>
+            <option value="chip">Chip — 1980s speech chip</option>
+            <option value="robot">Robot — heavy ring modulation</option>
+            <option value="pa">PA — tannoy in a large hall</option>
+            <option value="clear">Clear — easiest to understand</option>
+            <option value="deep">Deep — slow movie-trailer read</option>
+          </select>
+          <div class="hint">Hear them all in voice-styles.html.</div>
+          <label class="switch" style="padding:9px 12px;margin-top:9px">
+            <input type="checkbox" id="allVoices">
+            <span class="track"><span class="knob"></span></span>
+            <span class="txt" style="font-size:13px">Carry every voice
+              <small>Adds about 600 KB, but lets the voice be changed at the stand.</small></span>
+          </label>
+        </div>
+        <div>
+          <label>Show the lines on screen</label>
+          <label class="switch" style="padding:9px 12px">
+            <input type="checkbox" id="showText" checked>
+            <span class="track"><span class="knob"></span></span>
+            <span class="txt" style="font-size:13px">Marquee across the top</span>
+          </label>
+        </div>
+      </div>
+      <div class="row" id="linesRow">
+        <div>
+          <label>What the announcer says</label>
+          <textarea id="lines" rows="5" placeholder="One line per row. Leave empty for the standard set."
+            style="width:100%;background:#121D30;border:1px solid #223149;color:#EAEFF8;border-radius:9px;padding:11px 12px;font:inherit;font-size:14px;resize:vertical"></textarea>
+          <div class="hint" id="linesHint">Empty means the standard nine lines.</div>
+        </div>
+      </div>
+      <div class="row two" style="margin-bottom:0">
+        <div>
+          <label>Volume <span id="volEcho" style="color:#EAEFF8">50%</span></label>
+          <input type="range" id="volume" min="0" max="100" value="50" style="width:100%">
+          <div class="hint">Turn it down next to a speaking theatre.</div>
+        </div>
+        <div>
+          <label>Announcer every (sec)</label>
+          <input type="number" id="attractSeconds" value="14" min="5" max="120">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Giveaway</h2>
+      <label class="switch">
+        <input type="checkbox" id="hasGiveaway">
+        <span class="track"><span class="knob"></span></span>
+        <span class="txt">There is a giveaway at this event
+          <small>Off removes the giveaway button, the draw screen and the claim timer.</small></span>
+      </label>
+      <div id="giveawayFields" hidden style="margin-top:14px">
+        <div class="row three">
+          <div id="f-prize">
+            <label>Prize <span class="req">*</span></label>
+            <input type="text" id="prize" placeholder="Nintendo Switch 2">
+            <div class="err">Name the prize, or switch the giveaway off.</div>
+          </div>
+          <div>
+            <label>Draw time</label>
+            <input type="text" id="drawTime" placeholder="3:30 PM">
+          </div>
+          <div>
+            <label>Claim window (sec)</label>
+            <input type="number" id="claimSeconds" value="10" min="3" max="120">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ right: preview + existing ============ -->
+  <div>
+    <div class="card">
+      <h2>Captions that will be generated</h2>
+      <div class="caps" id="caps"></div>
+      <div class="hint" style="margin-top:9px">
+        20 in total, written once and reused for every conference.
+        <span class="tok">Blue</span> fills in from the player's result.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Hashtags</h2>
+      <div id="tags" style="font-size:13px;color:#cfdaea;word-break:break-word">—</div>
+      <div class="row" style="margin-top:12px;margin-bottom:0">
+        <div>
+          <label>Extra hashtags</label>
+          <input type="text" id="extraTags" placeholder="#RSAC, #Infosec">
+          <div class="hint">Optional. The conference tag and the Strike48 tags are added for you.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Conferences already live</h2>
+      <div id="events"><div class="hint">Loading…</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="bar">
+  <div class="status" id="status">Fill in the conference name to begin.</div>
+  <button class="ghost" id="resetBtn">Clear form</button>
+  <button class="primary" id="publishBtn" disabled>Publish and go live</button>
+</div>
+
+<script type="module">
+// Caption template library.
+//
+// One set of templates serves every conference. Event-specific words are tokens
+// filled at build time ({event}, {partner}, {hashtags}) or at share time
+// ({time}, {botTime}, {rank}, {correct}). Nothing here names a conference, so
+// adding an event needs no new copy and two events never collide.
+//
+// A template that mentions the partner is skipped automatically when an event
+// has no partner, so a solo booth never reads "Strike48 and ".
+
+const TEMPLATES = [
+  "I raced an Agentic SOC at {event} and lost. It triaged a live attack in {botTime}s. My best was {time}s ({rank}). Work that normally costs me half an hour of pivoting between consoles was done before I finished reading the alert. Thanks Strike48 and {partner}. {hashtags}",
+  "Something I learned at {event}. You can't out-click an Agentic SOC. {botTime}s to triage a live attack, and it still left the judgment call to me. Strike48 and {partner} are at the booth if you want a go. {hashtags}",
+  "Raced an AI at {event} and lost on time, {time}s against {botTime}s. Still walked away happy. It did the grinding and I made the call. {hashtags}",
+  "Every stand here has AI written on it somewhere. At {event}, Strike48 and {partner} actually let me race one. Live attack triaged in {botTime}s with a human approving every action. I scored {rank}. {hashtags}",
+  "Went head to head with an Agentic SOC at the Strike48 and {partner} booth ({event}). It is faster than any analyst I know and that suits me fine. It clears the noise so the humans get to think. {hashtags}",
+  "Beat the Bot at {event}. I got {correct}/3 in {time}s and ranked {rank}. The AI went 3/3 in {botTime}s. If your team is buried in tier 1 alerts, go and see what this does. {hashtags}",
+  "The best thing I found at {event} was not a slide deck. It was a 60 second race against an Agentic SOC. It wins on speed and you leave understanding why that matters. Find Strike48 and {partner}. {hashtags}",
+  "I have sat through a lot of AI SOC pitches. At {event}, Strike48 and {partner} handed me a controller and let me race the thing instead. {botTime}s triage, human in command. More demos should work like this. {hashtags}",
+  "Took the Beat the Bot challenge at {event} and ranked {rank}. The machine correlates at machine speed. The analyst still owns the decision. That balance is what sold me. {hashtags}",
+  "Leaving {event} fairly convinced the SOC of the next few years is human plus agent rather than one or the other. Raced the agent, scored {rank}, and watched it hand back the time I usually lose to triage. Thanks Strike48 and {partner}. {hashtags}",
+  "One alert, three calls. How bad is it, what is it, and what do you do first. I took {time}s and got {correct}/3. The Agentic SOC at {event} made all three in {botTime}s. Humbling in the best way. {hashtags}",
+  "Spent {time}s on a single alert at {event}. The agent spent {botTime}s. The gap is not about being clever, it is about how long correlation takes a human. Worth seeing at the Strike48 and {partner} stand. {hashtags}",
+  "Tier 1 triage is the part of the job nobody misses. At {event} I watched an Agentic SOC do it in {botTime}s while I was still reading the alert. Ranked {rank}. Go and try it. {hashtags}",
+  "{event}, and the most useful sixty seconds of my day was a race I lost to an AI. {time}s me, {botTime}s it. Strike48 and {partner} are worth a visit. {hashtags}",
+  "My score at {event} was {correct}/3 in {time}s, ranked {rank}. The agent went 3/3 in {botTime}s. I am not upset about it. That speed is exactly what a buried SOC needs. {hashtags}",
+  "Good demos let you touch the thing. At {event}, Strike48 and {partner} put an Agentic SOC in front of me and said race it. I lost. Learned more in a minute than I would from any deck. {hashtags}",
+  "Ranked {rank} against an Agentic SOC at {event}. The point is not that it beat me. The point is it handed the decision straight back to a human once it had done the digging. {hashtags}",
+  "If you are at {event} and your SOC is drowning in alerts, go and spend sixty seconds at the Strike48 and {partner} booth. The AI triages in {botTime}s. You will understand the pitch immediately. {hashtags}",
+  "Took on the Agentic SOC at {event}. {time}s against {botTime}s, and I still got {correct}/3, which I will take. Analysts keep the judgment, the machine takes the grind. {hashtags}",
+  "The thing I will remember from {event} is a sixty second race I lost to an agent. Scored {rank}. Thanks to Strike48 and {partner} for making the point properly. {hashtags}",
+];
+
+// Solo versions, used when an event has no partner. Same voice, no second name.
+const SOLO_FALLBACK = {
+  0:  "I raced an Agentic SOC at {event} and lost. It triaged a live attack in {botTime}s. My best was {time}s ({rank}). Work that normally costs me half an hour of pivoting between consoles was done before I finished reading the alert. Thanks Strike48. {hashtags}",
+  1:  "Something I learned at {event}. You can't out-click an Agentic SOC. {botTime}s to triage a live attack, and it still left the judgment call to me. Strike48 are at the booth if you want a go. {hashtags}",
+  3:  "Every stand here has AI written on it somewhere. At {event}, Strike48 actually let me race one. Live attack triaged in {botTime}s with a human approving every action. I scored {rank}. {hashtags}",
+  4:  "Went head to head with an Agentic SOC at the Strike48 booth ({event}). It is faster than any analyst I know and that suits me fine. It clears the noise so the humans get to think. {hashtags}",
+  6:  "The best thing I found at {event} was not a slide deck. It was a 60 second race against an Agentic SOC. It wins on speed and you leave understanding why that matters. Find the Strike48 stand. {hashtags}",
+  7:  "I have sat through a lot of AI SOC pitches. At {event}, Strike48 handed me a controller and let me race the thing instead. {botTime}s triage, human in command. More demos should work like this. {hashtags}",
+  9:  "Leaving {event} fairly convinced the SOC of the next few years is human plus agent rather than one or the other. Raced the agent, scored {rank}, and watched it hand back the time I usually lose to triage. Thanks Strike48. {hashtags}",
+  11: "Spent {time}s on a single alert at {event}. The agent spent {botTime}s. The gap is not about being clever, it is about how long correlation takes a human. Worth seeing at the Strike48 stand. {hashtags}",
+  13: "{event}, and the most useful sixty seconds of my day was a race I lost to an AI. {time}s me, {botTime}s it. The Strike48 stand is worth a visit. {hashtags}",
+  15: "Good demos let you touch the thing. At {event}, Strike48 put an Agentic SOC in front of me and said race it. I lost. Learned more in a minute than I would from any deck. {hashtags}",
+  17: "If you are at {event} and your SOC is drowning in alerts, go and spend sixty seconds at the Strike48 booth. The AI triages in {botTime}s. You will understand the pitch immediately. {hashtags}",
+  19: "The thing I will remember from {event} is a sixty second race I lost to an agent. Scored {rank}. Thanks to Strike48 for making the point properly. {hashtags}",
+};
+
+// "CyberCon 2026" -> "#CyberCon2026".  Strips punctuation, keeps digits.
+function eventHashtag(eventName) {
+  const t = String(eventName || '').replace(/[^A-Za-z0-9]/g, '');
+  return t ? '#' + t : '';
+}
+
+function buildHashtags(eventName, extra) {
+  const base = ['#AgenticAI', '#CyberSecurity', '#SOC', '#Strike48'];
+  const ev = eventHashtag(eventName);
+  const list = (ev ? [ev] : []).concat(Array.isArray(extra) ? extra : [], base);
+  const seen = new Set(), out = [];
+  for (const h of list) {
+    const tag = h.startsWith('#') ? h : '#' + h;
+    const k = tag.toLowerCase();
+    if (!seen.has(k)) { seen.add(k); out.push(tag); }
+  }
+  return out.join(' ');
+}
+
+// Fill the build-time tokens, leaving the share-time ones in place.
+function captionsForEvent(ev) {
+  const hashtags = buildHashtags(ev.eventName, ev.hashtags);
+  const partner = (ev.partner && ev.partner.name) || '';
+  return TEMPLATES.map((tpl, i) => {
+    let t = tpl;
+    if (!partner && SOLO_FALLBACK[i]) t = SOLO_FALLBACK[i];
+    return t
+      .replace(/\{event\}/g, ev.eventName)
+      .replace(/\{partner\}/g, partner)
+      .replace(/\{hashtags\}/g, hashtags);
+  });
+}
+
+// Share-time fill. Used by the share page.
+function fillCaption(tpl, v) {
+  return String(tpl)
+    .replace(/\{time\}/g, v.time ?? '')
+    .replace(/\{botTime\}/g, v.botTime ?? '3.5')
+    .replace(/\{rank\}/g, v.rank ?? '')
+    .replace(/\{correct\}/g, v.correct ?? '0');
+}
+
+
+const $ = id => document.getElementById(id);
+const files = { logo: null, partnerLogo: null };
+
+/* ---------- slug ---------- */
+function slugify(s){
+  return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60);
+}
+let slugTouched = false;
+$('slug').addEventListener('input', () => { slugTouched = true; render(); });
+$('eventName').addEventListener('input', () => {
+  if (!slugTouched) $('slug').value = slugify($('eventName').value);
+  render();
+});
+
+/* ---------- toggles ---------- */
+for (const [cb, box] of [['hasPartner','partnerFields'], ['hasGiveaway','giveawayFields']]) {
+  $(cb).addEventListener('change', () => { $(box).hidden = !$(cb).checked; render(); });
+}
+
+/* ---------- file drops, with a dark-artwork check in the browser ---------- */
+function wireDrop(key){
+  const el = $('drop-' + key), input = el.querySelector('input');
+  // Guard against re-entry: input.click() dispatches a click that bubbles
+  // back up to this same container and would call us again.
+  el.addEventListener('click', e => { if (e.target !== input) input.click(); });
+  el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('over'); });
+  el.addEventListener('dragleave', () => el.classList.remove('over'));
+  el.addEventListener('drop', e => {
+    e.preventDefault(); el.classList.remove('over');
+    if (e.dataTransfer.files[0]) take(e.dataTransfer.files[0]);
+  });
+  input.addEventListener('change', () => { if (input.files[0]) take(input.files[0]); });
+
+  async function take(file){
+    if (file.size > 8 * 1024 * 1024) { setStatus('That logo is over 8 MB. Export a smaller one.', 'no'); return; }
+    const dataUrl = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(file); });
+    files[key] = { name: file.name, type: file.type, dataUrl };
+    el.innerHTML = `<img src="${dataUrl}" alt=""><div class="fn">${file.name}</div>`;
+    el.appendChild(input);
+    checkDark(key, dataUrl);
+    render();
+  }
+}
+wireDrop('logo'); wireDrop('partnerLogo');
+
+// Same brightness test the build runs, so you find out here instead of at the booth.
+function checkDark(key, dataUrl){
+  const box = $('warn-' + key);
+  const img = new Image();
+  img.onload = () => {
+    try{
+      const c = document.createElement('canvas');
+      const w = c.width = Math.min(img.width, 240), h = c.height = Math.max(1, Math.round(img.height * w / img.width));
+      const x = c.getContext('2d'); x.drawImage(img, 0, 0, w, h);
+      const d = x.getImageData(0, 0, w, h).data;
+      let sum = 0, n = 0;
+      for (let i = 0; i < d.length; i += 4){
+        if (d[i+3] < 40) continue;
+        sum += 0.2126*d[i] + 0.7152*d[i+1] + 0.0722*d[i+2]; n++;
+      }
+      if (!n) { box.style.display='block'; box.textContent='That image looks fully transparent.'; return; }
+      const mean = sum / n;
+      if (mean < 90){
+        box.style.display = 'block';
+        box.textContent = `This artwork is dark (brightness ${mean.toFixed(0)} of 255). The scorecard background is near-black, so it will be hard to see. Ask for a white version.`;
+      } else { box.style.display = 'none'; }
+    }catch(e){ box.style.display='none'; }
+  };
+  img.src = dataUrl;
+}
+
+/* ---------- build the event object from the form ---------- */
+function read(){
+  const ev = {
+    eventName: $('eventName').value.trim(),
+    slug: ($('slug').value.trim() || slugify($('eventName').value)),
+    venue: $('venue').value.trim(),
+    booth: $('booth').value.trim(),
+    language: $('language').value,
+    botTime: parseFloat($('botTime').value) || 3.5,
+    hashtags: $('extraTags').value.split(/[,\s]+/).filter(Boolean),
+  };
+  if ($('hasPartner').checked) {
+    ev.partner = {
+      name: $('partnerName').value.trim(),
+      linkedIn: $('partnerLinkedIn').value.trim(),
+    };
+  }
+  var customLines = $('lines').value.split('\n').map(t => t.trim()).filter(Boolean);
+  ev.audio = {
+    music: $('hasMusic').checked,
+    voice: $('hasVoice').checked,
+    style: $('voiceStyle').value,
+    track: $('musicTrack').value,
+    allVoices: $('allVoices').checked,
+    showText: $('showText').checked,
+    ...(customLines.length ? { lines: customLines } : {}),
+    volume: (parseInt($('volume').value, 10) || 50) / 100,
+    attractSeconds: parseInt($('attractSeconds').value, 10) || 14,
+  };
+  ev.giveaway = $('hasGiveaway').checked
+    ? { enabled:true, prize:$('prize').value.trim(), drawTime:$('drawTime').value.trim(),
+        claimSeconds: parseInt($('claimSeconds').value,10) || 10 }
+    : { enabled:false };
+  return ev;
+}
+
+function problems(ev){
+  const out = {};
+  if (!ev.eventName) out.eventName = 1;
+  if (ev.slug && !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(ev.slug)) out.slug = 1;
+  if (!ev.slug) out.slug = 1;
+  if (ev.partner && !ev.partner.name) out.partnerName = 1;
+  if (ev.giveaway.enabled && !ev.giveaway.prize) out.prize = 1;
+  return out;
+}
+
+/* ---------- live preview ---------- */
+function render(){
+  const ev = read();
+  const bad = problems(ev);
+  for (const [f, id] of [['eventName','f-eventName'],['slug','f-slug'],
+                         ['partnerName','f-partnerName'],['prize','f-prize']]) {
+    const el = $(id); if (el) el.classList.toggle('bad', !!bad[f]);
+  }
+  $('slugEcho').textContent = ev.slug || '…';
+  $('volEcho').textContent = Math.round(ev.audio.volume * 100) + '%';
+  var nLines = (ev.audio.lines || []).length;
+  $('linesHint').textContent = nLines
+    ? nLines + ' custom line' + (nLines === 1 ? '' : 's') +
+      '. Each one is rendered in the arcade voice when you publish.'
+    : 'Empty means the standard nine lines.';
+  $('linesRow').style.display = $('hasVoice').checked ? '' : 'none';
+  $('styleRow').style.display = $('hasVoice').checked ? '' : 'none';
+  $('trackRow').style.display = $('hasMusic').checked ? '' : 'none';
+  $('langHint').textContent = ev.language === 'en' ? ' ' : 'Translation review is still open for this language.';
+
+  if (ev.eventName) {
+    const caps = captionsForEvent(ev);
+    $('caps').innerHTML = caps.map((c,i) =>
+      `<div class="cap"><b>${i+1}.</b> ` +
+      c.replace(/[<>&]/g, m => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]))
+       .replace(/\{(\w+)\}/g, '<span class="tok">{$1}</span>') + `</div>`).join('');
+    $('tags').textContent = buildHashtags(ev.eventName, ev.hashtags);
+  } else {
+    $('caps').innerHTML = '<div class="cap" style="color:#5D6E8B">Captions appear here once you name the conference.</div>';
+    $('tags').textContent = '—';
+  }
+
+  const ready = !Object.keys(bad).length;
+  $('publishBtn').disabled = !ready;
+  if (!ev.eventName) setStatus('Fill in the conference name to begin.');
+  else if (!ready) setStatus('Some required fields still need filling in.', 'no');
+  else setStatus(`Ready. ${ev.partner ? 'With ' + ev.partner.name : 'Solo booth'}. ` +
+    `Giveaway ${ev.giveaway.enabled ? 'on' : 'off'}. ` +
+    `Sound ${ev.audio.music ? Math.round(ev.audio.volume*100) + '%' : 'off'}` +
+    `${ev.audio.music && ev.audio.voice ? ' with announcer' : ''}.`);
+}
+function setStatus(msg, kind){ const s = $('status'); s.textContent = msg; s.className = 'status' + (kind ? ' ' + kind : ''); }
+document.querySelectorAll('input,select,textarea').forEach(el => el.addEventListener('input', render));
+
+/* ---------- existing events ---------- */
+async function loadEvents(){
+  // Opened straight off disk there is no server to ask, so say so plainly
+  // rather than letting a failed fetch log an error.
+  if (!location.protocol.startsWith('http')) {
+    $('events').innerHTML = '<div class="hint">Open this page from the deployment to see what is live.</div>';
+    return;
+  }
+  try{
+    const r = await fetch('/api/events');
+    const j = await r.json();
+    const list = j.events || [];
+    $('events').innerHTML = list.length ? list.map(e => `
+      <div class="ev">
+        <div style="flex:1;min-width:0">
+          <div class="nm">${e.eventName}</div>
+          <div class="meta">/e/${e.slug}${e.partner ? ' · with ' + e.partner : ' · solo'}${e.venue ? ' · ' + e.venue : ''}</div>
+        </div>
+        <span class="pill ${e.giveaway ? 'on' : ''}">${e.giveaway ? 'giveaway' : 'no giveaway'}</span>
+        <a class="pill" href="/e/${e.slug}" target="_blank">open</a>
+      </div>`).join('')
+      : '<div class="hint">Nothing published yet.</div>';
+  }catch(e){ $('events').innerHTML = '<div class="hint">Could not load the list.</div>'; }
+}
+
+/* ---------- publish ---------- */
+$('publishBtn').addEventListener('click', async () => {
+  const ev = read();
+  const pw = $('pw').value;
+  if (!pw) { setStatus('Enter the publish password, top right.', 'no'); $('pw').focus(); return; }
+  $('publishBtn').disabled = true;
+  setStatus('Publishing. This takes about a minute.');
+  try{
+    const r = await fetch('/api/publish', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'x-admin-password': pw },
+      body: JSON.stringify({ event: ev, logos: files }),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) { setStatus(j.error || `Publish failed (${r.status}).`, 'no'); $('publishBtn').disabled = false; return; }
+    setStatus(j.message || `Published. ${ev.eventName} goes live in about a minute at /e/${ev.slug}.`, 'ok');
+    setTimeout(loadEvents, 2500);
+  }catch(e){
+    setStatus('Could not reach the server: ' + e.message, 'no');
+  }
+  $('publishBtn').disabled = false;
+});
+
+$('resetBtn').addEventListener('click', () => {
+  document.querySelectorAll('input').forEach(i => { if (i.type === 'checkbox') i.checked = false; else if (i.id !== 'pw') i.value = ''; });
+  $('botTime').value = '3.5'; $('claimSeconds').value = '10';
+  $('hasMusic').checked = true; $('hasVoice').checked = true;
+  $('volume').value = '50'; $('attractSeconds').value = '14';
+  $('lines').value = ''; $('voiceStyle').value = 'announcer'; $('showText').checked = true;
+  $('musicTrack').value = 'arcade-loop.mp3'; $('allVoices').checked = false;
+  files.logo = files.partnerLogo = null; slugTouched = false;
+  $('partnerFields').hidden = $('giveawayFields').hidden = true;
+  for (const k of ['logo','partnerLogo']) {
+    const el = $('drop-' + k), inp = el.querySelector('input');
+    el.innerHTML = '<div class="ph">Click or drop a logo.</div>'; el.appendChild(inp);
+    $('warn-' + k).style.display = 'none';
+  }
+  render();
+});
+
+render(); loadEvents();
+</script>
+</body>
+</html>
