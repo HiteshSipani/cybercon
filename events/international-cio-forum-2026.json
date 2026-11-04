@@ -7,6 +7,18 @@
   "hashtags": [
     "#keystone"
   ],
+  "logos": {
+    "cardEventW": 233,
+    "cardEventH": 99,
+    "cardPartnerW": 90,
+    "cardPartnerH": 101,
+    "gameEvent": 73,
+    "gameStrike": 38,
+    "gamePartner": 67,
+    "posEvent": "left",
+    "posStrike": "right",
+    "posPartner": "right"
+  },
   "logo": "international-cio-forum-2026-event.jpg",
   "partner": {
     "name": "Keystone Group",
@@ -17,11 +29,22 @@
     "music": true,
     "voice": true,
     "volume": 0.5,
-    "attractSeconds": 14,
+    "attractSeconds": 10,
     "showText": true,
     "allVoices": true,
     "style": "announcer",
-    "track": "arcade-loop.mp3"
+    "track": "arcade-loop.mp3",
+    "lines": [
+      "Beat the Bot!",
+      "Can you out-think an Agentic SOC?",
+      "One alert. Three calls. Seconds on the clock.",
+      "Think you are faster than AI?",
+      "Step up. Take the challenge.",
+      "The Strike48 bot is waiting.",
+      "How fast can you triage?",
+      "Challenger approaching!",
+      "Ready when you are."
+    ]
   },
   "giveaway": {
     "enabled": false
