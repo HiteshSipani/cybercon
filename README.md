@@ -174,10 +174,15 @@ Worth five minutes, whichever way you published.
 
 Every event produces both. Use whichever suits the room.
 
-**The offline file** is one self-contained HTML. Logos, all four typefaces and
-all 59 scenarios live inside it, and it makes no network requests at all, so it
-runs behind a captive portal or with no wifi. Copy it to the laptop and
-double-click it.
+**The offline file** is one self-contained HTML. Logos, typefaces, the music,
+the announcer audio and all 59 scenarios live inside it, and it makes no network
+requests at all, so it runs behind a captive portal or with no wifi. Copy it to
+the laptop and double-click it.
+
+Download it from the deployment at `/e/<slug>/offline.html`, or press
+**download** next to the conference in the Studio's live list. Publishing from
+the Studio produces both versions, so you never need a terminal to get the
+booth file.
 
 **The hosted version** at `/e/<slug>` is the same game at a URL you can put on a
 QR code. It needs a connection but updates when you republish and works on a
@@ -269,6 +274,7 @@ Only `eventName` is required.
 
 ```
 public/e/<slug>/index.html        hosted game, served at /e/<slug>
+public/e/<slug>/offline.html      the self-contained file, downloadable
 public/e/<slug>/event-logo.png    normalised logo the scorecard fetches
 public/e/<slug>/partner-logo.png
 public/admin/index.html           the Studio, caption library inlined

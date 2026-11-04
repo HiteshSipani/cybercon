@@ -101,7 +101,7 @@ export function spokenForm(text) {
 export const DEFAULT_LINES = [
   'Beat the Bot!',
   'Can you out-think an Agentic SOC?',
-  'One alert. Three calls. Sixty seconds.',
+  'One alert. Three calls. Seconds on the clock.',
   'Think you are faster than artificial intelligence?',
   'Step up. Take the challenge.',
   'The machine is waiting.',
@@ -326,7 +326,7 @@ export async function buildClips(lines, styleName) {
 
 async function compare() {
   const demo = ['Beat the Bot!', 'Can you out-think an Agentic SOC?',
-                'One alert. Three calls. Sixty seconds.'];
+                'One alert. Three calls. Seconds on the clock.'];
   const names = Object.keys(STYLES);
   console.log('\n  rendering ' + demo.length + ' lines in ' + names.length + ' styles\n');
   const rows = [];

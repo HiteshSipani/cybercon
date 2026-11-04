@@ -305,8 +305,17 @@
   <!-- ============ right: preview + existing ============ -->
   <div>
     <div class="card">
-      <h2>Captions that will be generated</h2>
+      <h2>Captions</h2>
       <div class="caps" id="caps"></div>
+      <textarea id="capEdit" rows="12" hidden
+        style="width:100%;background:#121D30;border:1px solid #223149;color:#EAEFF8;
+               border-radius:10px;padding:11px;font:inherit;font-size:13px;resize:vertical"></textarea>
+      <label class="switch" style="margin-top:10px;padding:9px 12px">
+        <input type="checkbox" id="ownCaps">
+        <span class="track"><span class="knob"></span></span>
+        <span class="txt" style="font-size:13px">Write my own
+          <small>Starts from these, one per row. Only for this conference.</small></span>
+      </label>
       <div class="hint" style="margin-top:9px">
         20 in total, written once and reused for every conference.
         <span class="tok">Blue</span> fills in from the player's result.
@@ -424,6 +433,10 @@ function read(){
     botTime: parseFloat($('botTime').value) || 3.5,
     hashtags: $('extraTags').value.split(/[,\s]+/).filter(Boolean),
   };
+  if ($('ownCaps').checked) {
+    const own = $('capEdit').value.split('\n').map(t => t.trim()).filter(Boolean);
+    if (own.length) ev.captions = own;
+  }
   if ($('hasPartner').checked) {
     ev.partner = {
       name: $('partnerName').value.trim(),
@@ -479,6 +492,14 @@ function render(){
   $('trackRow').style.display = $('hasMusic').checked ? '' : 'none';
   $('langHint').textContent = ev.language === 'en' ? ' ' : 'Translation review is still open for this language.';
 
+  // Switching the toggle on seeds the editor from whatever is generated now.
+  const own = $('ownCaps').checked;
+  $('capEdit').hidden = !own;
+  $('caps').style.display = own ? 'none' : '';
+  if (own && !$('capEdit').value.trim() && ev.eventName) {
+    $('capEdit').value = captionsForEvent({ ...ev, captions: null }).join('\n');
+  }
+
   if (ev.eventName) {
     const caps = captionsForEvent(ev);
     $('caps').innerHTML = caps.map((c,i) =>
@@ -523,6 +544,8 @@ async function loadEvents(){
         </div>
         <span class="pill ${e.giveaway ? 'on' : ''}">${e.giveaway ? 'giveaway' : 'no giveaway'}</span>
         <a class="pill" href="/e/${e.slug}" target="_blank">open</a>
+        <a class="pill" href="/e/${e.slug}/offline.html" download="beat-the-bot-${e.slug}.html"
+           title="Self-contained file for the booth laptop">download</a>
       </div>`).join('')
       : '<div class="hint">Nothing published yet.</div>';
   }catch(e){ $('events').innerHTML = '<div class="hint">Could not load the list.</div>'; }
@@ -557,6 +580,7 @@ $('resetBtn').addEventListener('click', () => {
   $('hasMusic').checked = true; $('hasVoice').checked = true;
   $('volume').value = '50'; $('attractSeconds').value = '14';
   $('lines').value = ''; $('voiceStyle').value = 'announcer'; $('showText').checked = true;
+  $('capEdit').value = ''; $('ownCaps').checked = false;
   $('musicTrack').value = 'arcade-loop.mp3'; $('allVoices').checked = false;
   files.logo = files.partnerLogo = null; slugTouched = false;
   $('partnerFields').hidden = $('giveawayFields').hidden = true;

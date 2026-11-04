@@ -115,6 +115,11 @@ export default async function handler(req, res) {
     botTime: ev.botTime ?? 3.5,
   };
   if (Array.isArray(ev.hashtags) && ev.hashtags.length) record.hashtags = ev.hashtags;
+  if (Array.isArray(ev.captions)) {
+    const caps = ev.captions.map(c => String(c).trim())
+                            .filter(c => c && c.length <= 1200).slice(0, 40);
+    if (caps.length) record.captions = caps;
+  }
 
   for (const [key, field] of [['logo', 'logo'], ['partnerLogo', 'partnerLogo']]) {
     const f = logos[key];

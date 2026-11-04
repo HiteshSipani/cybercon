@@ -359,6 +359,11 @@ async function buildOne(slug, shared) {
   await writeFile(path.join(outDir, 'index.html'), withTrack(html, music.hosted));
   html = withTrack(html, music.offline);
 
+  // The self-contained file is published too, so it can be downloaded from the
+  // deployment onto a booth laptop. Without this it only ever existed in dist/,
+  // which is not deployed, and publishing from the Studio left no way to get it.
+  await writeFile(path.join(outDir, 'offline.html'), html);
+
   // A separate build carrying every announcer voice, so they can be compared
   // in the game over the music rather than in isolation. Not deployed.
   if (shared.allVoices) {
@@ -509,6 +514,7 @@ async function main() {
     console.log(`     captions  ${r.entry.captions.length}`);
     console.log(`     audio     ${r.audio}`);
     console.log(`     hosted    /e/${slug}`);
+    console.log(`     download  /e/${slug}/offline.html  (self-contained)`);
     console.log(`     offline   dist/beat-the-bot-${slug}.html  (${(r.sizes.html / 1024).toFixed(0)} KB)`);
     for (const n of r.notes) console.log(`     note      ${n}`);
     console.log('');
