@@ -1,0 +1,18 @@
+{
+  "buildCommand": "node tools/build.mjs --all",
+  "outputDirectory": "public",
+  "rewrites": [
+    {
+      "source": "/r",
+      "destination": "/api/r"
+    },
+    {
+      "source": "/e/:slug",
+      "destination": "/e/:slug/index.html"
+    },
+    {
+      "source": "/studio",
+      "destination": "/admin/index.html"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "strike48-booth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "build:all": "node tools/build.mjs --all",
+    "deploy": "node tools/build.mjs --all && vercel --prod",
+    "voice": "node tools/make-voice.mjs",
+    "voicetest": "node tools/build.mjs cybercon-2026 --voices",
+    "voices": "node tools/make-voice.mjs --compare"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@breezystack/lamejs": "^1.2.7",
+    "@fontsource/ibm-plex-mono": "^5.1.1",
+    "@fontsource/inter": "^5.1.0",
+    "@fontsource/press-start-2p": "^5.1.0",
+    "@fontsource/space-grotesk": "^5.1.0",
+    "@vercel/og": "0.6.2",
+    "lamejs": "^1.2.1",
+    "mespeak": "^2.0.2",
+    "react": "18.3.1",
+    "sharp": "^0.33.5"
+  },
+  "private": true,
+  "type": "module"
+}
